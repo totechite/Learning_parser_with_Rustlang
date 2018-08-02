@@ -1,7 +1,5 @@
 #[derive(Debug)]
-
-struct Token{
-    type: String,
+pub struct Token{
+    type: TokenNames,
     text: String
 }
-
