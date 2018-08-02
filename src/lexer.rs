@@ -1,11 +1,13 @@
 extern crate regex;
 use self::regex::Regex;
 
+#[derive(Debug)]
 pub struct Token{
     char_type: TokenNames,
-    text: String
+    pub text: String
 }
 
+#[derive(Debug)]
 enum TokenNames{
     N_A,
     EOF,
@@ -26,7 +28,7 @@ impl Lexer {
 
     pub fn consume(&mut self) -> &mut Lexer{
             self.position += 1u32;
-            self.theChar = Some(self.text.chars().nth(self.position as usize).unwrap());
+            self.theChar = self.text.chars().nth(self.position as usize);
             self
     }
 
@@ -50,40 +52,40 @@ impl Lexer {
         }
     }
     
-    fn name_token(&self) -> Token{
-        let mut strV = "";
+    fn name_token(&mut self) -> Token{
+        let mut strV = "".to_string();
         while self.is_letter() {
-            strV = &[strV, &self.theChar.unwrap().to_string()].concat();
+            strV += &self.theChar.unwrap().to_string();
             self.consume();
         }
         Token{char_type: TokenNames::NAME, text: strV.to_string()}
     }
 
-    pub fn next_token(&self) -> Result<Token, String>{
+    pub fn next_token(&mut self) -> Result<Token, String>{
         while self.theChar!=None {
-            match self.theChar {
-                Some('\n')|Some('\t')|Some('\n')|Some('\r')
+            match self.theChar.unwrap() {
+                '\n'|'\t'|'\r'
                 => {
                     self.white_space();
                     continue;
-                },
-                Some(',') => {
+                    },
+                ',' => {
                     self.consume();
-                    Ok(Token{char_type: TokenNames::COMMA, text: ",".to_string()});
+                    return Ok(Token{char_type: TokenNames::COMMA, text: ",".to_string()});
                 },
-                Some('[') => {
+                '[' => {
                     self.consume();
-                    Ok(Token{char_type: TokenNames::L_BRACKET, text: "[".to_string()});
+                    return Ok(Token{char_type: TokenNames::L_BRACKET, text: "[".to_string()});
                 },
-                Some(']') => {
+                ']' => {
                     self.consume();
-                    Ok(Token{char_type: TokenNames::R_BRACKET, text: "]".to_string()});
+                    return Ok(Token{char_type: TokenNames::R_BRACKET, text: "]".to_string()});
                 },
-                Some(_) => {
+                _ => {
                     if self.is_letter(){
-                        Ok(self.name_token());
+                        return Ok(self.name_token());
                     }else{
-                        Err("EuntimeError".to_string());
+                        return Err("RuntimeError".to_string());
                     }
                 }
             }
