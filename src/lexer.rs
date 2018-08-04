@@ -1,21 +1,7 @@
 extern crate regex;
 use self::regex::Regex;
 
-#[derive(Debug)]
-pub struct Token{
-    char_type: TokenNames,
-    pub text: String
-}
-
-#[derive(Debug)]
-enum TokenNames{
-    N_A,
-    EOF,
-    NAME,
-    COMMA,
-    L_BRACKET,
-    R_BRACKET
-}
+use token::Token;
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -32,13 +18,13 @@ impl Lexer {
             self
     }
 
-    pub fn match_char(&mut self, reqChar: char) -> Result<&mut Lexer, String>{
-        if reqChar == self.theChar.unwrap(){
-            Ok(self.consume())
-        }else{
-            Err("error".to_string())
-        }
-    }
+    // pub fn match_char(&mut self, reqChar: char) -> Result<&mut Lexer, String>{
+    //     if reqChar == self.theChar.unwrap(){
+    //         Ok(self.consume())
+    //     }else{
+    //         Err("error".to_string())
+    //     }
+    // }
 
     fn is_letter(&self) -> bool{
         let re = Regex::new(r"[a-z]|[A-Z]").unwrap();
@@ -58,7 +44,7 @@ impl Lexer {
             strV += &self.theChar.unwrap().to_string();
             self.consume();
         }
-        Token{char_type: TokenNames::NAME, text: strV.to_string()}
+        Token::NAME(strV.to_string())
     }
 
     pub fn next_token(&mut self) -> Result<Token, String>{
@@ -71,15 +57,15 @@ impl Lexer {
                     },
                 ',' => {
                     self.consume();
-                    return Ok(Token{char_type: TokenNames::COMMA, text: ",".to_string()});
+                    return Ok(Token::COMMA);
                 },
                 '[' => {
                     self.consume();
-                    return Ok(Token{char_type: TokenNames::L_BRACKET, text: "[".to_string()});
+                    return Ok(Token::L_BRACKET);
                 },
                 ']' => {
                     self.consume();
-                    return Ok(Token{char_type: TokenNames::R_BRACKET, text: "]".to_string()});
+                    return Ok(Token::R_BRACKET);
                 },
                 _ => {
                     if self.is_letter(){
@@ -90,7 +76,7 @@ impl Lexer {
                 }
             }
         }
-        Ok(Token{char_type: TokenNames::EOF, text: "<EOF>".to_string()})
+        Ok(Token::EOF)
     }
 }
 

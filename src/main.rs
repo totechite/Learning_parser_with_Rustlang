@@ -1,13 +1,12 @@
 use std::fs;
 use std::io::{stdout, Write, BufWriter, prelude::*};
 
+pub mod token;
+use token::Token;
 pub mod lexer;
-use lexer::Lexer;
-use lexer::LexerBuilder;
-
+use lexer::{Lexer, LexerBuilder};
 
 fn main(){
-    // let string: String = "[a,b,[abc,ab,a]]".to_string();
     let mut file = fs::File::open("sample.md").unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents);
@@ -18,6 +17,9 @@ fn main(){
     while frag{
         let tc = lexer.next_token().unwrap();
         writeln!(out, "{:?}", &tc).unwrap();
-        frag = tc.text != "<EOF>";
+        match tc {
+            Token::EOF => frag = false,
+            _ => {},
+            }
     }
 }
