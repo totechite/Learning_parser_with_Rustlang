@@ -16,7 +16,7 @@ fn main(){
     let mut frag = true;
     while frag{
         let tc = lexer.next_token().unwrap();
-        writeln!(out, "{:?}", &tc).unwrap();
+        writeln!(out, "{:#?}", &tc).unwrap();
         match tc {
             Token::EOF => frag = false,
             _ => {},
